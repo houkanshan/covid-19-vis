@@ -1,6 +1,5 @@
 export default function filterAndMergeData(data, keys) {
   return keys.map((key) => {
-    console.log(key)
     let mergedData
     data.forEach(row => {
       if ([row.city, row.state, row.country].includes(key)) {

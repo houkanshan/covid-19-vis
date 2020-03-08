@@ -11,7 +11,7 @@ import getKeyOptions from '../utils/getKeyOptions'
 import keysToOptions, { optionsToKeys } from '../utils/keysToOptions'
 import filterAndMergeData from '../utils/filterAndMergeData'
 
-const isClient = process.isBrowser
+const isClient = process.browser
 
 const Chart = dynamic(() => import('../components/Chart'), { ssr: false })
 
