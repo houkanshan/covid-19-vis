@@ -1,20 +1,24 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, lazy } from 'react'
+import dynamic from 'next/dynamic'
+
 import useSWR from 'swr'
 import Select from 'react-select'
 
-import Error from './components/Error'
-import parseCSV from './utils/parseCSV'
-import { parseQuery, formatQuery } from './utils/UrlQueryHelper'
-import getKeyOptions from './utils/getKeyOptions'
-import keysToOptions, { optionsToKeys } from './utils/keysToOptions'
-import filterAndMergeData from './utils/filterAndMergeData'
+import Error from '../components/Error'
+import parseCSV from '../utils/parseCSV'
+import { parseQuery, formatQuery } from '../utils/UrlQueryHelper'
+import getKeyOptions from '../utils/getKeyOptions'
+import keysToOptions, { optionsToKeys } from '../utils/keysToOptions'
+import filterAndMergeData from '../utils/filterAndMergeData'
 
-const isClient = typeof window !== 'undefined'
+const isClient = process.isBrowser
 
+// const Chart = dynamic(() => import(''), { ssr: false })
 let Chart
 if (isClient) {
-  Chart = require('./components/Chart').default
+  Chart = require('../components/Chart').default
 }
+
 
 const confirmedAPI = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
 
