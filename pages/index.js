@@ -13,11 +13,7 @@ import filterAndMergeData from '../utils/filterAndMergeData'
 
 const isClient = process.isBrowser
 
-// const Chart = dynamic(() => import(''), { ssr: false })
-let Chart
-if (isClient) {
-  Chart = require('../components/Chart').default
-}
+const Chart = dynamic(() => import('../components/Chart'), { ssr: false })
 
 
 const confirmedAPI = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
@@ -67,7 +63,7 @@ export default function Index() {
         classNamePrefix="select"
         onChange={handleFilterKeyChange}
       />
-      {Chart && <Chart data={chartData} />}
+      <Chart data={chartData} />
       <footer>Data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html">JHC</a></footer>
     </div>
   )
