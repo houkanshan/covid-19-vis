@@ -8,7 +8,7 @@ import Error from '../components/Error'
 import parseCSV from '../utils/SeriesData/parseCSV'
 import parseLatestData from '../utils/LatestData/parseLatestData'
 import { parseQuery, formatQuery } from '../utils/UrlQueryHelper'
-import getKeyOptions from '../utils/getKeyOptions'
+import getKeyOptionsMap from '../utils/getKeyOptionsMap'
 import keysToOptions, { optionsToKeys } from '../utils/keysToOptions'
 import filterAndMergeData from '../utils/filterAndMergeData'
 
@@ -32,28 +32,34 @@ export default function Index() {
     error: latestDataError
   } = useSWR(latestDataApi, (k) => fetch(k).then(r => r.json()))
 
-  const [filterKeys, setFilterKeys] = useState(defaultKeys)
-  const [chartData, setChartData] = useState([])
-
   const confirmedData = useMemo(() => confirmedCSVText && parseCSV(confirmedCSVText), [confirmedCSVText])
-  const options = useMemo(() => confirmedData && keysToOptions(getKeyOptions(confirmedData)), [confirmedData])
+  const keyOptionsMap = useMemo(() => confirmedData && getKeyOptionsMap(confirmedData), [confirmedData])
+  const options = useMemo(() => keyOptionsMap && Object.values(keyOptionsMap), [keyOptionsMap])
 
   const latestData = useMemo(() => latestDataRaw && parseLatestData(latestDataRaw), [latestDataRaw])
+
+  const defaultOptions = useMemo(() => keyOptionsMap && defaultKeys && keysToOptions(defaultKeys, keyOptionsMap), [keyOptionsMap, defaultKeys])
+
+  const [filterKeys, setFilterKeys] = useState(defaultKeys)
+  const [chartData, setChartData] = useState([])
 
   const handleFilterKeyChange = useCallback((selectedOptions) => {
     const keys = optionsToKeys(selectedOptions || [])
     history.pushState(null, '', `?${formatQuery(keys)}`)
     setFilterKeys(keys)
   }, [])
+  const normalizeFilterKeys = useCallback((keys) => {
+    return keys.filter((k) => !!keyOptionsMap[k])
+  }, [keyOptionsMap])
 
   useEffect(() => {
     if (!confirmedData || !latestData) { return }
-    setChartData(filterAndMergeData(confirmedData, latestData, filterKeys))
+    setChartData(filterAndMergeData(confirmedData, latestData, normalizeFilterKeys(filterKeys)))
   }, [filterKeys, confirmedData, latestData])
 
   // Error & Loading
-  if (confirmedError) {
-    return <Error error={confirmedError}/>
+  if (confirmedError || latestDataError) {
+    return <Error error={confirmedError || latestDataError}/>
   }
   if (!confirmedCSVText) {
     return <div>Loading...</div>
@@ -67,9 +73,12 @@ export default function Index() {
         <title>COVID-19 Cases Chart</title>
       </Head>
       <h1>COVID-19 Cases Chart</h1>
+      <div className="field">
+        <label>Search by City, State, or Country</label>
+      </div>
       <Select
         placeholder="City, State, or Country"
-        defaultValue={keysToOptions(filterKeys)}
+        defaultValue={defaultOptions}
         isMulti
         options={options}
         className="basic-multi-select"
@@ -79,9 +88,9 @@ export default function Index() {
       <Chart data={chartData} />
 
       <footer>
-        Data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a>
-        &nbsp;-&nbsp;
-        Source code: <a target="_blank" href="https://github.com/houkanshan/covid-19-vis">github</a>
+        data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a>
+        <br/>
+        source code: <a target="_blank" href="https://github.com/houkanshan/covid-19-vis">github</a>
       </footer>
     </div>
   )

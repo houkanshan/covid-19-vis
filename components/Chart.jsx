@@ -29,12 +29,11 @@ export default function CountChart({ data }) {
           position="date*count"
           size={2}
           color={'key'}
-          shape={'smooth'}
         />
         <Geom
           type="point"
           position="date*count"
-          size={4}
+          size={2}
           shape={'circle'}
           color={'key'}
           style={{
