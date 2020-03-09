@@ -8,7 +8,7 @@ export default function parseSeries(seriesData, startDateISO) {
     {
       date: format(addDays(startDate, index), 'yyyy-MM-dd'),
       // date: addDays(startDate, index),
-      count: parseInt(count, 10),
+      count: parseInt(count, 10) || 0,
     }
   ))
 }

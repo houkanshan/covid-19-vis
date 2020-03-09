@@ -36,12 +36,13 @@ export default function filterAndMergeData(data, latestData, keys) {
       }
     })
 
-    if (mergedData[mergedData.length - 1].date !== latestMergedData.date) {
-      mergedData.push({
-        ...latestMergedData[0],
-        key,
-      })
+    if (mergedData[mergedData.length - 1].date === latestMergedData[0].date) {
+      mergedData.length = mergedData.length - 1
     }
+    mergedData.push({
+      ...latestMergedData[0],
+      key,
+    })
 
 
     return {
