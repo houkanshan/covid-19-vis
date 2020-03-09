@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-
+import Head from 'next/head'
 import useSWR from 'swr'
 import Select from 'react-select'
 
@@ -63,7 +63,10 @@ export default function Index() {
 
   return (
     <div>
-      <h1>COVID-19 Case Chart</h1>
+      <Head>
+        <title>COVID-19 Cases Chart</title>
+      </Head>
+      <h1>COVID-19 Cases Chart</h1>
       <Select
         placeholder="City, State, or Country"
         defaultValue={keysToOptions(filterKeys)}
@@ -74,7 +77,8 @@ export default function Index() {
         onChange={handleFilterKeyChange}
       />
       <Chart data={chartData} />
-      <footer>Data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html">JHC</a></footer>
+
+      <footer>Data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a></footer>
     </div>
   )
 }
