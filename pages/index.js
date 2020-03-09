@@ -74,10 +74,10 @@ export default function Index() {
       </Head>
       <h1>COVID-19 Cases Chart</h1>
       <div className="field">
-        <label>Search by City, State, or Country</label>
+        <label>Search by City, State(abbr.), or Country</label>
       </div>
       <Select
-        placeholder="City, State, or Country"
+        placeholder="City, State(abbr.), or Country"
         defaultValue={defaultOptions}
         isMulti
         options={options}

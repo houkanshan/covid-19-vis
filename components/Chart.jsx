@@ -17,7 +17,7 @@ export default function CountChart({ data }) {
   }, [data])
   return (
     <div className="chart">
-      <Chart height={400} data={mergedData} forceFit>
+      <Chart height={400} data={mergedData} forceFit padding="auto">
         <Legend />
         <Axis name="date" />
         <Axis name="count" />
