@@ -78,7 +78,11 @@ export default function Index() {
       />
       <Chart data={chartData} />
 
-      <footer>Data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a></footer>
+      <footer>
+        Data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a>
+        &nbsp;-&nbsp;
+        Source code: <a target="_blank" href="https://github.com/houkanshan/covid-19-vis">github</a>
+      </footer>
     </div>
   )
 }
