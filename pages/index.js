@@ -37,6 +37,7 @@ export default function Index() {
   const options = useMemo(() => keyOptionsMap && Object.values(keyOptionsMap), [keyOptionsMap])
 
   const latestData = useMemo(() => latestDataRaw && parseLatestData(latestDataRaw), [latestDataRaw])
+  console.log(latestData)
 
   const defaultOptions = useMemo(() => keyOptionsMap && defaultKeys && keysToOptions(defaultKeys, keyOptionsMap), [keyOptionsMap, defaultKeys])
 
@@ -64,8 +65,6 @@ export default function Index() {
   if (!confirmedCSVText) {
     return <div>Loading...</div>
   }
-
-  console.log(chartData)
 
   return (
     <div>
