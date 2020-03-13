@@ -1,5 +1,6 @@
 import parse from 'csv-parse/lib/sync'
 import parseSeries from './parseSeries'
+import stateNameMap from '../stateNameMap'
 
 const cityCol = 0
 const countryCol = 1
@@ -15,7 +16,7 @@ export default function parseCSV(csvText) {
     const [state, city] = cityState.split(', ').reverse()
     return {
       city,
-      state,
+      state: stateNameMap[state] || state,
       cityState,
       country: row[countryCol].trim(),
       data: parseSeries(row.slice(dataCol), startDateISO)
