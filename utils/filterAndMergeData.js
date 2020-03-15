@@ -48,9 +48,13 @@ export default function filterAndMergeData(data, latestData, keys) {
       console.error('Latest data is failed to merge')
     }
 
+    const trimmedMergedData = mergedData.filter((d) => d.count !== 0)
+
     return {
       key,
-      data: mergedData.filter((d) => d.count !== 0),
+      data: trimmedMergedData,
+      startDate: trimmedMergedData[0].date,
+      defaultRange: [0, trimmedMergedData.length - 1]
     }
   })
 }

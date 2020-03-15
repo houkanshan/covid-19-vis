@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import dynamic from 'next/dynamic'
 
 import {
   Chart,
@@ -9,30 +8,41 @@ import {
   Legend,
 } from 'bizcharts'
 
-export default function CountChart({ data }) {
+export default function CountChart({ data, useRange, dateRanges }) {
   const mergedData = useMemo(() => {
-    return data.reduce((acc, v) => {
-      return acc.concat(v.data)
+    return data.reduce((acc, { key, data, defaultRange }) => {
+      if (useRange) {
+        const range = dateRanges[key] || defaultRange
+        data = data.slice(range[0], range[1])
+      }
+
+      return acc.concat(data.map((d, index) => ({
+        ...d,
+        index,
+      })))
     }, [])
-  }, [data])
+  }, [data, dateRanges])
+
+  const xKey = useRange ? 'index' : 'date'
+
   return (
     <div className="chart">
       <Chart height={400} data={mergedData} forceFit padding="auto">
         <Legend />
-        <Axis name="date" />
+        <Axis name={xKey} />
         <Axis name="count" />
         <Tooltip
           crosshairs={{ type: "y" }}
         />
         <Geom
           type="line"
-          position="date*count"
+          position={[xKey, 'count'].join('*')}
           size={2}
           color={'key'}
         />
         <Geom
           type="point"
-          position="date*count"
+          position={[xKey, 'count'].join('*')}
           size={2}
           shape={'circle'}
           color={'key'}

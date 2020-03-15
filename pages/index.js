@@ -3,7 +3,9 @@ import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import useSWR from 'swr'
 import Select from 'react-select'
+import Checkbox from '@material-ui/core/Checkbox'
 
+import DateSliders from '../components/DateSliders'
 import Error from '../components/Error'
 import parseCSV from '../utils/SeriesData/parseCSV'
 import parseLatestData from '../utils/LatestData/parseLatestData'
@@ -30,19 +32,27 @@ export default function Index() {
   const {
     data: latestDataRaw,
     error: latestDataError
-  } = useSWR(latestDataApi, (k) => fetch(k).then(r => r.json()))
+  } = useSWR(latestDataApi, (k) => fetch(k).then(r => r.json()), { loadingTimeout: 2000 })
 
   const confirmedData = useMemo(() => confirmedCSVText && parseCSV(confirmedCSVText), [confirmedCSVText])
   const keyOptionsMap = useMemo(() => confirmedData && getKeyOptionsMap(confirmedData), [confirmedData])
   const options = useMemo(() => keyOptionsMap && Object.values(keyOptionsMap), [keyOptionsMap])
 
-  const latestData = useMemo(() => latestDataRaw && parseLatestData(latestDataRaw), [latestDataRaw])
-  console.log(latestData)
+  const latestData = useMemo(() => {
+    if (!latestDataRaw) return []
+    if (!latestDataRaw.features) return [] // error happen, usually api timeout.
+    return parseLatestData(latestDataRaw)
+  }, [latestDataRaw])
+
+  console.log('LatestData:', latestData)
 
   const defaultOptions = useMemo(() => keyOptionsMap && defaultKeys && keysToOptions(defaultKeys, keyOptionsMap), [keyOptionsMap, defaultKeys])
 
   const [filterKeys, setFilterKeys] = useState(defaultKeys)
   const [chartData, setChartData] = useState([])
+  const [dateRanges, setDateRanges] = useState({})
+  const [isAligning, setIsAligning] = useState(false)
+  console.log(dateRanges)
 
   const handleFilterKeyChange = useCallback((selectedOptions) => {
     const keys = optionsToKeys(selectedOptions || [])
@@ -66,6 +76,8 @@ export default function Index() {
     return <div>Loading...</div>
   }
 
+  console.log('ChartData:', chartData)
+
   return (
     <div>
       <Head>
@@ -84,7 +96,22 @@ export default function Index() {
         classNamePrefix="select"
         onChange={handleFilterKeyChange}
       />
-      <Chart data={chartData} />
+      <Chart data={chartData} useRange={isAligning} dateRanges={dateRanges} />
+      <div className="field">
+        <label className="checkbox">
+          <Checkbox
+            checked={isAligning}
+            onChange={(e) => setIsAligning(e.target.checked)}
+            value="primary"
+            inputProps={{ 'aria-label': 'primary checkbox' }}
+          />
+          <span className="text">
+            Custom Date Range
+          </span>
+        </label>
+      </div>
+
+      {isAligning && <DateSliders chartData={chartData} value={dateRanges} onChange={setDateRanges} />}
 
       <footer>
         data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a>
