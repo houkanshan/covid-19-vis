@@ -85,7 +85,7 @@ export default function Index() {
       </Head>
       <h1>COVID-19 Cases Chart</h1>
       <div className="field">
-        <label>Search by City, State(abbr.), or Country</label>
+        <label>Search by City(stopped), State(abbr.), or Country</label>
       </div>
       <Select
         placeholder="City, State(abbr.), or Country"

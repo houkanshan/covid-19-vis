@@ -13,7 +13,7 @@ export default function CountChart({ data, useRange, dateRanges }) {
     return data.reduce((acc, { key, data, defaultRange }) => {
       if (useRange) {
         const range = dateRanges[key] || defaultRange
-        data = data.slice(range[0], range[1])
+        data = data.slice(range[0], range[1] + 1)
       }
 
       return acc.concat(data.map((d, index) => ({
