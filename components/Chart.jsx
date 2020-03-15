@@ -37,13 +37,13 @@ export default function CountChart({ data, useRange, dateRanges }) {
         <Geom
           type="line"
           position={[xKey, 'count'].join('*')}
-          size={2}
+          size={1}
           color={'key'}
         />
         <Geom
           type="point"
           position={[xKey, 'count'].join('*')}
-          size={2}
+          size={1}
           shape={'circle'}
           color={'key'}
           style={{
