@@ -9,6 +9,7 @@ import DateSliders from '../components/DateSliders'
 import Error from '../components/Error'
 import parseCSV from '../utils/SeriesData/parseCSV'
 import parseLatestData from '../utils/LatestData/parseLatestData'
+import parseTestedData from '../utils/TestedData/parseTestedData'
 import { parseQuery, formatQuery } from '../utils/UrlQueryHelper'
 import getKeyOptionsMap from '../utils/getKeyOptionsMap'
 import keysToOptions, { optionsToKeys } from '../utils/keysToOptions'
@@ -17,10 +18,12 @@ import filterAndMergeData from '../utils/filterAndMergeData'
 const isClient = process.browser
 
 const Chart = dynamic(() => import('../components/Chart'), { ssr: false })
+const TestedChart = dynamic(() => import('../components/TestedChart'), { ssr: false })
 
 
 const confirmedAPI = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
-const latestDataApi = 'https://services9.arcgis.com/N9p5hsImWXAccRNI/arcgis/rest/services/Z7biAeD8PAkqgmWhxG2A/FeatureServer/1/query?f=json&where=Confirmed%20%3E%200&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc%2CCountry_Region%20asc%2CProvince_State%20asc&resultOffset=0&resultRecordCount=250&cacheHint=true'
+const latestDataAPI = 'https://services9.arcgis.com/N9p5hsImWXAccRNI/arcgis/rest/services/Z7biAeD8PAkqgmWhxG2A/FeatureServer/1/query?f=json&where=Confirmed%20%3E%200&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=Confirmed%20desc%2CCountry_Region%20asc%2CProvince_State%20asc&resultOffset=0&resultRecordCount=250&cacheHint=true'
+const testedDataAPI = 'https://covidtracking.com/api/states/daily'
 
 export default function Index() {
   const defaultKeys = useMemo(() => isClient ? parseQuery(location.search) : [], [isClient, parseQuery])
@@ -32,7 +35,12 @@ export default function Index() {
   const {
     data: latestDataRaw,
     error: latestDataError
-  } = useSWR(latestDataApi, (k) => fetch(k).then(r => r.json()), { loadingTimeout: 2000 })
+  } = useSWR(latestDataAPI, (k) => fetch(k).then(r => r.json()), { loadingTimeout: 2000 })
+
+  const {
+    data: testedData,
+    error: testedDataError,
+  } = useSWR(testedDataAPI, (k) => fetch(k).then(r => r.json()).then(parseTestedData))
 
   const confirmedData = useMemo(() => confirmedCSVText && parseCSV(confirmedCSVText), [confirmedCSVText])
   const keyOptionsMap = useMemo(() => confirmedData && getKeyOptionsMap(confirmedData), [confirmedData])
@@ -45,6 +53,7 @@ export default function Index() {
   }, [latestDataRaw])
 
   console.log('LatestData:', latestData)
+  console.log('TestedData:', testedData)
 
   const defaultOptions = useMemo(() => keyOptionsMap && defaultKeys && keysToOptions(defaultKeys, keyOptionsMap), [keyOptionsMap, defaultKeys])
 
@@ -52,7 +61,7 @@ export default function Index() {
   const [chartData, setChartData] = useState([])
   const [dateRanges, setDateRanges] = useState({})
   const [isAligning, setIsAligning] = useState(false)
-  console.log(dateRanges)
+  const [showTested, setShowTested] = useState(false)
 
   const handleFilterKeyChange = useCallback((selectedOptions) => {
     const keys = optionsToKeys(selectedOptions || [])
@@ -64,9 +73,9 @@ export default function Index() {
   }, [keyOptionsMap])
 
   useEffect(() => {
-    if (!confirmedData || !latestData) { return }
-    setChartData(filterAndMergeData(confirmedData, latestData, normalizeFilterKeys(filterKeys)))
-  }, [filterKeys, confirmedData, latestData])
+    if (!confirmedData || !latestData || !testedData) { return }
+    setChartData(filterAndMergeData(confirmedData, latestData, testedData, normalizeFilterKeys(filterKeys), showTested))
+  }, [filterKeys, confirmedData, latestData, testedData])
 
   // Error & Loading
   if (confirmedError || latestDataError) {
@@ -96,7 +105,7 @@ export default function Index() {
         classNamePrefix="select"
         onChange={handleFilterKeyChange}
       />
-      <Chart data={chartData} useRange={isAligning} dateRanges={dateRanges} />
+      <Chart chartData={chartData} useRange={isAligning} dateRanges={dateRanges} />
       <div className="field">
         <label className="checkbox">
           <Checkbox
@@ -106,15 +115,33 @@ export default function Index() {
             inputProps={{ 'aria-label': 'primary checkbox' }}
           />
           <span className="text">
-            Custom Date Range
+            Custom date range
           </span>
         </label>
       </div>
 
       {isAligning && <DateSliders chartData={chartData} value={dateRanges} onChange={setDateRanges} />}
 
+      <div className="field">
+        <label className="checkbox">
+          <Checkbox
+            checked={showTested}
+            onChange={(e) => setShowTested(e.target.checked)}
+            value="primary"
+            inputProps={{ 'aria-label': 'primary checkbox' }}
+          />
+          <span className="text">
+            Show confirmed / tested per day
+          </span>
+        </label>
+      </div>
+      {showTested && <TestedChart chartData={chartData} /> }
+
       <footer>
-        data source: <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a>
+        data source:
+        <a target="_blank" href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6">Johns Hopkins CSSE</a>
+        ,&nbsp;
+        <a target="_blank" href="https://covidtracking.com">The COVID Tracking Project</a>
         <br/>
         source code: <a target="_blank" href="https://github.com/houkanshan/covid-19-vis">github</a>
       </footer>

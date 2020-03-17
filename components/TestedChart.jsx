@@ -8,23 +8,14 @@ import {
   Legend,
 } from 'bizcharts'
 
-export default function CountChart({ chartData, useRange, dateRanges }) {
+export default function TestedChart({ chartData }) {
   const mergedData = useMemo(() => {
-    return chartData.reduce((acc, { key, data, defaultRange }) => {
-      if (useRange) {
-        const range = dateRanges[key] || defaultRange
-        data = data.slice(range[0], range[1] + 1)
-      }
-
-      return acc.concat(data.map((d, index) => ({
-        ...d,
-        index,
-      })))
+    return chartData.reduce((acc, { testedData }) => {
+      return testedData ? acc.concat(testedData) : acc
     }, [])
-  }, [chartData, dateRanges])
-  console.log(mergedData)
+  }, [chartData])
 
-  const xKey = useRange ? 'index' : 'date'
+  const xKey = 'date'
 
   return (
     <div className="chart">
@@ -32,6 +23,7 @@ export default function CountChart({ chartData, useRange, dateRanges }) {
         <Legend />
         <Axis name={xKey} />
         <Axis name="count" />
+        <Axis name="total" />
         <Tooltip
           crosshairs={{ type: "y" }}
         />
@@ -40,7 +32,20 @@ export default function CountChart({ chartData, useRange, dateRanges }) {
           position={[xKey, 'count'].join('*')}
           size={1}
           color={'key'}
+          tooltip={[[xKey, 'count', 'positive', 'total', 'key'].join('*'), (date, rate, positive, total, state) => {
+            return {
+              name: `${state}: ${rate.toFixed(3)}`,
+              value: `positive: ${positive}, tested: ${total}`
+            }
+          }]}
         />
+        {/* <Geom
+          type="area"
+          position={[xKey, 'total'].join('*')}
+          size={1}
+          color={'key'}
+          tooltip={false}
+        /> */}
         <Geom
           type="point"
           position={[xKey, 'count'].join('*')}

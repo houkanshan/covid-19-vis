@@ -1,4 +1,4 @@
-export default function filterAndMergeData(data, latestData, keys) {
+export default function filterAndMergeData(data, latestData, testedData, keys, showTested) {
   return keys.map((key) => {
     let mergedData
     data.forEach(row => {
@@ -53,6 +53,7 @@ export default function filterAndMergeData(data, latestData, keys) {
     return {
       key,
       data: trimmedMergedData,
+      testedData: testedData[key],
       startDate: trimmedMergedData[0].date,
       defaultRange: [0, trimmedMergedData.length - 1]
     }
