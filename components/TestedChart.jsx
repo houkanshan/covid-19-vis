@@ -19,7 +19,7 @@ export default function TestedChart({ chartData }) {
 
   return (
     <div className="chart">
-      <h3>Daily Rate</h3>
+      <h3>Daily Positive / Tested Rate</h3>
       <Chart height={200} data={mergedData} forceFit padding="auto">
         <Legend />
         <Axis name={xKey} />
@@ -33,7 +33,7 @@ export default function TestedChart({ chartData }) {
           position={[xKey, 'dailyRate'].join('*')}
           size={1}
           color={'key'}
-          tooltip={[[xKey, 'dailyRate', 'positive', 'total', 'key'].join('*'), (date, rate, positive, total, state) => {
+          tooltip={[[xKey, 'dailyRate', 'dailyPositive', 'dailyTotal', 'key'].join('*'), (date, rate, positive, total, state) => {
             return {
               name: `${state} = ${rate.toFixed(3)}`,
               value: `Positive: ${positive}, Tested: ${total}`
@@ -60,13 +60,13 @@ export default function TestedChart({ chartData }) {
         />
       </Chart>
 
-      <h3>Total Rate</h3>
+      <h3>Total Positive / Tested Rate</h3>
       <Chart height={200} data={mergedData} forceFit padding="auto">
         <Legend />
         <Axis name={xKey} />
         <Axis name="totalRate" />
         <Tooltip
-          crosshairs={{ type: "y" }}
+          crosshairs={{ type: 'y' }}
         />
         <Geom
           type="line"

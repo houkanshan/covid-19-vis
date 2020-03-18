@@ -16,10 +16,13 @@ export default function parseTestedData(data) {
         prevTotal = prevRow.total
         prevPositive = prevRow.positive
       }
+      const dailyTotal = row.total - prevTotal
+      const dailyPositive = row.positive - prevPositive
       return {
         ...row,
         key: row.state,
-        dailyRate: Math.min((row.positive - prevPositive) / (row.total - prevTotal), 1) || 1, // could be NaN
+        dailyTotal, dailyPositive,
+        dailyRate: Math.min(dailyPositive / dailyTotal, 1) || 1, // could be NaN
         totalRate: row.positive / row.total,
         date: format(parseISO(row.dateChecked), 'yyyy-MM-dd'),
       }

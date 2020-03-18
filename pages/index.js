@@ -131,7 +131,7 @@ export default function Index() {
             inputProps={{ 'aria-label': 'primary checkbox' }}
           />
           <span className="text">
-            Show confirmed / tested rate
+            Show positive per tested
           </span>
         </label>
       </div>
