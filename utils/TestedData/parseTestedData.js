@@ -1,22 +1,29 @@
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
 import groupBy from 'lodash/groupBy'
+import sortBy from 'lodash/sortBy'
 
 export default function parseTestedData(data) {
-  data = data.map((row, i) => {
-    let prevTotal = 0
-    let prevPositive = 0
-    if (i !== 0) {
-      const prevRow = data[i - 1]
-      prevTotal = prevRow.total
-      prevPositive = prevRow.positive
-    }
-    return {
-      ...row,
-      key: row.state + ' Daily Positive / Tested',
-      count: Math.min((row.positive - prevPositive) / (row.total - prevTotal), 1),
-      date: format(parseISO(row.dateChecked), 'yyyy-MM-dd'),
-    }
-  })
-  return groupBy(data, 'state')
+  const groupedData = groupBy(sortBy(data, 'date'), 'state')
+  console.log(groupedData)
+  for (let key in groupedData) {
+    const stateData = groupedData[key]
+    groupedData[key] = stateData.map((row, i) => {
+      let prevTotal = 0
+      let prevPositive = 0
+      if (i !== 0) {
+        const prevRow = stateData[i - 1]
+        prevTotal = prevRow.total
+        prevPositive = prevRow.positive
+      }
+      return {
+        ...row,
+        key: row.state,
+        dailyRate: Math.min((row.positive - prevPositive) / (row.total - prevTotal), 1) || 1, // could be NaN
+        totalRate: row.positive / row.total,
+        date: format(parseISO(row.dateChecked), 'yyyy-MM-dd'),
+      }
+    })
+  }
+  return groupedData
 }

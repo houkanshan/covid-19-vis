@@ -19,23 +19,24 @@ export default function TestedChart({ chartData }) {
 
   return (
     <div className="chart">
-      <Chart height={400} data={mergedData} forceFit padding="auto">
+      <h3>Daily Rate</h3>
+      <Chart height={200} data={mergedData} forceFit padding="auto">
         <Legend />
         <Axis name={xKey} />
-        <Axis name="count" />
+        <Axis name="dailyRate" />
         <Axis name="total" />
         <Tooltip
           crosshairs={{ type: "y" }}
         />
         <Geom
           type="line"
-          position={[xKey, 'count'].join('*')}
+          position={[xKey, 'dailyRate'].join('*')}
           size={1}
           color={'key'}
-          tooltip={[[xKey, 'count', 'positive', 'total', 'key'].join('*'), (date, rate, positive, total, state) => {
+          tooltip={[[xKey, 'dailyRate', 'positive', 'total', 'key'].join('*'), (date, rate, positive, total, state) => {
             return {
-              name: `${state}: ${rate.toFixed(3)}`,
-              value: `positive: ${positive}, tested: ${total}`
+              name: `${state} = ${rate.toFixed(3)}`,
+              value: `Positive: ${positive}, Tested: ${total}`
             }
           }]}
         />
@@ -48,7 +49,47 @@ export default function TestedChart({ chartData }) {
         /> */}
         <Geom
           type="point"
-          position={[xKey, 'count'].join('*')}
+          position={[xKey, 'dailyRate'].join('*')}
+          size={1}
+          shape={'circle'}
+          color={'key'}
+          style={{
+            stroke: '#fff',
+            lineWidth: 1
+          }}
+        />
+      </Chart>
+
+      <h3>Total Rate</h3>
+      <Chart height={200} data={mergedData} forceFit padding="auto">
+        <Legend />
+        <Axis name={xKey} />
+        <Axis name="totalRate" />
+        <Tooltip
+          crosshairs={{ type: "y" }}
+        />
+        <Geom
+          type="line"
+          position={[xKey, 'totalRate'].join('*')}
+          size={1}
+          color={'key'}
+          tooltip={[[xKey, 'totalRate', 'positive', 'total', 'key'].join('*'), (date, rate, positive, total, state) => {
+            return {
+              name: `${state} = ${rate.toFixed(3)}`,
+              value: `Positive: ${positive}, Tested: ${total}`
+            }
+          }]}
+        />
+        {/* <Geom
+          type="area"
+          position={[xKey, 'total'].join('*')}
+          size={1}
+          color={'key'}
+          tooltip={false}
+        /> */}
+        <Geom
+          type="point"
+          position={[xKey, 'totalRate'].join('*')}
           size={1}
           shape={'circle'}
           color={'key'}
