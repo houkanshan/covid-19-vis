@@ -22,7 +22,7 @@ export default function parseTestedData(data) {
         ...row,
         key: row.state,
         dailyTotal, dailyPositive,
-        dailyRate: Math.min(dailyPositive / dailyTotal, 1) || 1, // could be NaN
+        dailyRate: Math.max(0, Math.min(dailyPositive / dailyTotal, 1)) || 1, // could be NaN
         totalRate: row.positive / row.total,
         date: format(parseISO(row.dateChecked), 'yyyy-MM-dd'),
       }
