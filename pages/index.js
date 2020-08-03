@@ -89,6 +89,19 @@ export default function Index() {
 
   return (
     <div>
+      <header className="message">
+        This project has been archived:
+        <br/>
+        This app was designed to merge different data from different sources and
+        compare the development tendency of different states and countries.
+        <br/>
+        And it has broken several times after the data providers changed their APIs.
+        <br/>
+        I'm not maintaining it since <a href="https://covidtracking.com/">The COVID Tracking Project</a> is providing
+        better data.
+        <br/>
+        Stay safe! - Mai
+      </header>
       <Head>
         <title>COVID-19 Cases Chart</title>
       </Head>
